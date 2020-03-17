@@ -58,12 +58,12 @@ for x in range(width):
         for y in range(height):
                 draw.point((x, y), (255, 255, 255))
 
-line(width//3,height//2,width*2//3,height//2)
-bezie((width//3,height//2), (width*2//3,height//2), (width//2,0), (width//2,height//3))
-#bezie((width//2,height//4), (width//2,height//2), (width*2//3,height//4), (width*2//3,height//2))
+line(width*0//16, height*7//16,width*16//16, height*7//16)
+bezie((width*8//16, height*4//16), (width*8//16, height*1//16), (width*4//16, height*1//16), (width*4//16, height*4//16))
+bezie((width*8//16, height*4//16), (width*8//16, height*1//16), (width*12//16, height*1//16), (width*12//16, height*4//16))
 
-#bezie((width//2,height*3//4), (width//2,height*5//8), (width//3,height*5//8), (width//3,height//2))
-#bezie((width//2,height*3//4), (width//2,height*5//8), (width*2//3,height*5//8), (width*2//3,height//2))
+bezie((width*4//16, height*4//16), (width*4//16 - width*1//32, height*7//16), (width*2//16, height*7//16), (width*0//16, height*7//16))
+bezie((width*12//16, height*4//16), (width*12//16 + width*1//32, height*7//16), (width*14//16, height*7//16), (width*16//16, height*7//16))
 
 image.show()
 #image.save("result.jpg")

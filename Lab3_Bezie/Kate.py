@@ -1,6 +1,6 @@
 import random
-from PIL import Image, ImageDraw #Подключим необходимые библиотеки
-from math import pi, sin, cos
+from math import cos, sin, pi
+from PIL import Image, ImageDraw
 
 def sign(x): # знак числа
         if x > 0:
@@ -8,7 +8,8 @@ def sign(x): # знак числа
         if x < 0:
                 return -1
         return 0
-def line(x1, y1, x2, y2):  # рисуем линию из точки (x1,y1) в точку (x2,y2)
+
+def line(x1, y1, x2, y2, draw):  # рисуем линию из точки (x1,y1) в точку (x2,y2)
         dX = abs(x2 - x1)
         dY = abs(y2 - y1)
         if dX >= dY: # если наклон по X больше Y, то X меняем на 1 и смотрим Y
@@ -40,49 +41,55 @@ def line(x1, y1, x2, y2):  # рисуем линию из точки (x1,y1) в 
                             x += dirX
                             err -= dY
 
-class tartilla():
-    def __init__(self):
-        self.direction = 0
-        self.x = 50
-        self.y = 500
-    def right(self, angle):
-        self.direction += angle
-        self.direction = self.direction % 360
-    def fd(self, distance):
-        old_x = self.x
-        old_y = self.y
-        self.x += distance * cos(self.direction/180*pi)
-        self.y += distance * sin(self.direction/180*pi)
-        line(round(old_x), round(old_y), round(self.x), round(self.y))
+class Turtle:
+    def __init__(self, x, y, angle, draw):
+        self.x = x
+        self.y = y
+        self.angle = angle
+        self.draw = draw
 
-def fractal(paint,length,iterations):
-    if iterations == 1:
-        paint.fd(length)
-        paint.fd(-length)
+    def move(self, count):
+        self.new_x = self.x + round(cos(self.angle)*count)
+        self.new_y = self.y + round(sin(self.angle)*count)
+        line(self.x, self.y, self.new_x, self.new_y, self.draw)
+        self.x = self.new_x
+        self.y = self.new_y
+
+    def rotate(self, angle):
+        self.angle += angle
+
+def fractal(size, depth, turtle):
+    if depth == 1:
+        turtle.move(size)
+        turtle.move(-size)
     else:
-        paint.fd(length//2)
-        paint.right(-30)
-        fractal(paint,length//2,iterations-1)
-        paint.right(30)
-        paint.fd(length//4)
-        paint.right(30)
-        fractal(paint,length//2,iterations-1)
-        paint.right(-30)
-        paint.fd(length//4)
-        paint.right(-30)
-        fractal(paint,length//2,iterations-1)
-        paint.right(30)
-        paint.fd(-length)
-        
-image = Image.open("white_picture.png") #Открываем изображение
+        turtle.move(size/2)
+        turtle.rotate(-pi/6)
+        fractal(size/2, depth - 1, turtle)
+        turtle.rotate(pi/6)
+        turtle.move(size/4)
+        turtle.rotate(pi/6)
+        fractal(size/2, depth - 1, turtle)
+        turtle.rotate(-pi/6)
+        turtle.move(size/4)
+        turtle.rotate(-pi/6)
+        fractal(size/2, depth - 1, turtle)
+        turtle.rotate(pi/6)
+        turtle.move(-size)
+
+image = Image.open("roof_half.jpg") #Открываем изображение
 draw = ImageDraw.Draw(image) #Создаем инструмент для рисования
-width  = image.size[0] #Определяем ширину 
-height = image.size[1] #Определяем высоту 	
+width  = image.size[0] #Определяем ширину
+height = image.size[1] #Определяем высоту
 pix = image.load() #Выгружаем значения пикселей
 
-paint = tartilla()
+for x in range(width):
+        for y in range(height):
+                draw.point((x, y), (255, 255, 255))
 
-fractal(paint, 1000, 6)
+turtle = Turtle(0, height//2, 0, draw)
+fractal(300, 6, turtle)
 
 image.show()
+
 del draw
