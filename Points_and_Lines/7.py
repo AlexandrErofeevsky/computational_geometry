@@ -7,7 +7,7 @@ class Point:
         self.y = y
         
     def __str__(self):
-        return "(%.2f,%.2f)"%(self.x,self.y)
+        return "(%.2f, %.2f)"%(self.x,self.y)
     
     def distanceTo(self, point):
         return math.sqrt((self.x - point.x)**2+(self.y - point.y)**2)
@@ -50,3 +50,12 @@ class Line:
     
     def fromCoord(x1,y1,x2,y2):
         return Line(y1-y2, x2-x1, x1*y2 - x2*y1)
+
+    def intersection(self, line):
+        if not self.isParallel(line):
+            inter_x = (line.c*self.b - self.c*line.b)/(line.b*self.a - self.b*line.a)
+            inter_y = (line.c*self.a - self.c*line.a)/(-line.b*self.a + self.b*line.a)
+            inter_point = Point(inter_x,inter_y)
+            return inter_point
+        else:
+            return None

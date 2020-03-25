@@ -96,14 +96,44 @@ class Line:
     def nearPoint(self, point):
         return self.intersection(self.perpendicular(point))
 
+    def sidePoint(self, point):
+        side = (point.x)*(self.y2 - self.y1) - (point.y - self.y1)
+        if round(abs(math.fabs(side)), 4) < 0.001:
+            return 'ON'
+        elif side < 0:
+            return 'LEFT'
+        else:
+            return 'RIGHT'
+
+    def oneSide(self, point1, point2):
+        side1 = self.sidePoint(point1)
+        side2 = self.sidePoint(point2)
+        match = [('LEFT', 'RIGHT'), ('RIGHT', 'LEFT')]
+        if (side1, side2) not in match:
+            return True
+        else:
+            return False
+
     @staticmethod
     def fromCoord(x1, y1, x2, y2):
         return Line(float(y1-y2), float(x2-x1), float(x1*y2-x2*y1))
 
-line1 = Line.fromCoord(0,1,1,0)
-point = Point(3,4)
-print(line1.nearPoint(point))
+line1 = Line.fromCoord(0, 1, 1, 0)
+point11 = Point(3, 4)
+point12 = Point(-2, -3)
+print(line1.oneSide(point11, point12))
 
-line1 = Line.fromCoord(12.85, -3.75, 7.86, 6.45)
-point = Point(15.784, -15.45)
-print(line1.nearPoint(point))
+line2 = Line.fromCoord(1, 0, 0, 1)
+point21 = Point(3, 3)
+point22 = Point(2, 5)
+print(line2.oneSide(point21, point22))
+
+line3 = Line.fromCoord(-3, 0, 0, 1)
+point31 = Point(12, 2)
+point32 = Point(3, 2)
+print(line3.oneSide(point31, point32))
+
+line4 = Line.fromCoord(-3, 0, 0, 1)
+point41 = Point(12, 2)
+point42 = Point(-6, -0.999)
+print(line4.oneSide(point41, point42))
