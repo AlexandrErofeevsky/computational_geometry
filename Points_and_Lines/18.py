@@ -195,13 +195,23 @@ class Line:
         else:
             i1 = math.sqrt((line.a)**2+(line.b)**2)
             i2 = math.sqrt((self.a)**2+(self.b)**2)
-            bis_a = i1*self.a + i2*line.a
-            bis_b = i1*self.b + i2*line.b
-            bis_c = i1*self.c + i2*line.c
-            bis = Line(bis_a,bis_b,bis_c)
+            bis1_a = i1*self.a + i2*line.a
+            bis1_b = i1*self.b + i2*line.b
+            bis1_c = i1*self.c + i2*line.c
+            bis2_a = i1*self.a - i2*line.a
+            bis2_b = i1*self.b - i2*line.b
+            bis2_c = i1*self.c - i2*line.c
+            inter_x = (self.intersection(line)).x + 1
+            p_minus = Point(inter_x, -bis2_a/bis2_b*inter_x - bis2_c/bis2_b)
+            p_plus = Point(inter_x, -bis1_a/bis1_b*inter_x - bis1_c/bis1_b)
+            dist_plus = self.distanceToPoint(p_plus)
+            dist_minus = self.distanceToPoint(p_minus)
+            if dist_plus < dist_minus:
+                bis = Line(bis1_a,bis1_b,bis1_c)
+            else:
+                bis = Line(bis2_a,bis2_b,bis2_c)
             bis.normalize()
             return bis
-        
     
     def fromCoord(x1,y1,x2,y2):
         return Line(y1-y2, x2-x1, x1*y2 - x2*y1)
@@ -214,10 +224,13 @@ line = Line.fromCoord(-7.73, -10.63, 14.18, -0.17)
 line2 = Line.fromCoord(-12.23, -7.67, 0.19, 7.40)
 print(line.bisectrix(line2))
 
-line = Line.fromCoord(1, 1, -2, -2)
-line2 = Line.fromCoord(0, 1, 1, 0)
+line = Line.fromCoord(8.72,4.10,-12.40,-4.68)
+line2 = Line.fromCoord(-6.24,3.54,-11.71,-10.15)
 print(line.bisectrix(line2))
 
 line = Line.fromCoord(4.27,11.18,-12.89,-1.11)
 line2 = Line.fromCoord(-5.45,-10.57,-2.30,-12.17)
+print(line.bisectrix(line2))
+line = Line.fromCoord(-3.27,12.67,-14.28,-1.06)
+line2 = Line.fromCoord(10.57,-9.07,13.31,-4.48)
 print(line.bisectrix(line2))
