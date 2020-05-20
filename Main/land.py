@@ -5,6 +5,8 @@ from OpenGL.GLUT import *
 from VandM import *
 from getZ import *
 import bmp_to_map
+import skybox
+import train
 
 window_width = 800
 window_height = 600
@@ -12,10 +14,10 @@ window_height = 600
 # Процедура инициализации
 def init():
     glEnable(GL_DEPTH_TEST)
-    glClearColor(1.0, 1.0, 1.0, 1.0) # Белый цвет для первоначальной закраски
+    glClearColor(0.5, 0.5, 0.5, 1) # Белый цвет для первоначальной закраски
     glMatrixMode(GL_PROJECTION) # Выбираем матрицу проекций
     glLoadIdentity()            # Сбрасываем все предыдущие трансформации
-    gluPerspective(90, window_width / window_height, 0.001, 30) # Задаем перспективу
+    gluPerspective(90, window_width / window_height, 0.1, 1000) # Задаем перспективу
 	#gluOrtho2D(-1.0, 1.0, -1.0, 1.0) # Определяем границы рисования по горизонтали и вертикали
     global anglex, angley, anglez, zoom, filled, height_map, camPOS, camDIR, camUP, objPOS, objDIR, objFACE
     anglex = 0
@@ -23,11 +25,11 @@ def init():
     anglez = 0
     zoom = 1.0
     filled = 0
-    height_map = bmp_to_map.height_map('map.bmp', 0.2)
+    height_map = bmp_to_map.height_map('map.bmp', 0.3)
     objPOS = Vector3(0,0,height_map[0][0])
     objDIR = Vector3(0.7,0.7,0)
     camPOS = objPOS.plusV(Vector3(-1, -1, 1))
-    camDIR = Vector3(0.7, 0.7, 0)
+    camDIR = Vector3(1, 1, 0)
     camUP = Vector3(0, 0, 1)
     objFACE = 0
 
@@ -66,7 +68,7 @@ def keyboardkeys(key, x, y):
         rotM = Matrix3x3.MRot(camUP, -3.14/18)
         camDIR = rotM.xV(camDIR)
     if key == b'i':
-        rotM = Matrix3x3.MRot(camDIR, 3.14/2)
+        rotM = Matrix3x3.MRot(camDIR, 3.14/18)
         camUP = rotM.xV(camUP)
     if key == b'y':
         rotM = Matrix3x3.MRot(camDIR, -3.14/18)
@@ -98,15 +100,26 @@ def specialkeys(key,x,y):
     if key == GLUT_KEY_LEFT:
         rotM = Matrix3x3.MRot(Vector3(0,0,1),-3.14/18)
         objDIR = rotM.xV(objDIR)
+        camDIR = rotM.xV(camDIR)
+        camPOS = objPOS.minusV(camDIR)
+        camPOS.z = objPOS.z + 0.5
         objFACE += 1
         if objFACE == 36 or objFACE == -36:
             objFACE = 0
     if key == GLUT_KEY_RIGHT:
         rotM = Matrix3x3.MRot(Vector3(0,0,1), 3.14/18)
         objDIR = rotM.xV(objDIR)
+        camDIR = rotM.xV(camDIR)
+        camPOS = objPOS.minusV(camDIR)
+        camPOS.z = objPOS.z + 0.5
         objFACE -= 1
         if objFACE == 36 or objFACE == -36:
             objFACE = 0
+    if camPOS.z<GetZ(camPOS.x,camPOS.y,height_map):
+        camPOS.z = GetZ(camPOS.x,camPOS.y,height_map)+0.3
+        camDIR.z -= 0.2
+    else:
+        camDIR.z = 0
 
 def cilinder():
 	R = 0.5
@@ -168,7 +181,7 @@ def draw(*args, **kwargs):
     glRotated(angley,0,1,0)
     glRotated(anglez,0,0,1)
     glScaled(zoom,zoom,zoom)
-    
+    """
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
     glPushMatrix()
     glColor3f(0,0,0.5)
@@ -177,14 +190,30 @@ def draw(*args, **kwargs):
     glRotated(90,-1,-1,0)
     sphere()
     glPopMatrix()
+    """
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+    glPushMatrix()
+    glColor3f(0,0,0.5)
+    glTranslated(objPOS.x,objPOS.y,objPOS.z)
+    glRotated(225,0,0,1)
+    glRotated(objFACE*10,0,0,1)
+    #glRotated(90,-1,-1,0)
+    train.train()
+    glPopMatrix()
     
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-    n = len(height_map)
-    m = len(height_map[0])
+    #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+    n = len(height_map)-1
+    m = len(height_map[0])-1
     for y in range(1, n, 2):
         for x in range(1, m, 2):
             glBegin(GL_TRIANGLE_FAN)
-            glColor3f(0, 0, 0)
+            if height_map[x][y] > 50:
+                glColor3f(1, 1, 1)
+            elif height_map[x][y]>12:
+                glColor3f(0.05,0.05,0.05)
+            else:
+                glColor3f(0,0.5,0)
             glVertex3d(x, y, height_map[x][y])
 
             glVertex3d(x + 1, y, height_map[x + 1][y])

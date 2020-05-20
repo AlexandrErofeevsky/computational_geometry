@@ -159,6 +159,7 @@ def cube():
 def draw(*args, **kwargs):
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) # Очищаем экран и заливаем текущим цветом фона
 	glLoadIdentity()
+	gluLookAt(0,0,3,0,0,2,-1,0,0)
 	global anglex, angley, anglez, filled
 	glRotated(anglex,1,0,0)
 	glRotated(angley,0,1,0)
@@ -172,12 +173,15 @@ def draw(*args, **kwargs):
 	glPushMatrix()
 	glColor3f(1, 0, 0)
 	glScaled(0.2, 0.2, 1)
+	
 	cilinder()
 	glPopMatrix()
 
 	glPushMatrix()
 	glColor3f(0, 0, 1)
 	glTranslated(0, 0, 0.5)
+	glRotated(-90,0,1,0)
+	#glRotated(90,1,0,0)
 	glScaled(1, 1, 0.25)
 	conus()
 	glPopMatrix()
